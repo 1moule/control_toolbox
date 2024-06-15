@@ -398,6 +398,10 @@ private:
   double d_error_;          /**< Derivative of position error. */
   double cmd_;              /**< Command to send. */
 
+  double i_separate_threshold_{};
+  double var_speed_i_a_ = DBL_MAX, var_speed_i_b_ = DBL_MAX;
+  bool i_separate_ = false, i_variable_speed_ = false;
+
   // Dynamics reconfigure
   bool dynamic_reconfig_initialized_;
   typedef dynamic_reconfigure::Server<control_toolbox::ParametersConfig> DynamicReconfigServer;

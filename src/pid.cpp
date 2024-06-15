@@ -333,7 +333,21 @@ double Pid::computeCommand(double error, double error_dot, ros::Duration dt)
   p_term = gains.p_gain_ * p_error_;
 
   // Calculate the integral of the position error
-  i_error_ += dt.toSec() * p_error_;
+  double integral_rate = 1.;
+  if (i_separate_) {
+    if (i_variable_speed_) {
+      if (std::abs(p_error_) <= var_speed_i_b_)
+        integral_rate = 1;
+      else if (std::abs(p_error_) <= var_speed_i_a_ + var_speed_i_b_)
+        integral_rate = ((var_speed_i_a_ - std::abs(p_error_)) + var_speed_i_b_) / var_speed_i_a_;
+    } else {
+      if (p_error_ < i_separate_threshold_)
+        integral_rate = 1.;
+      else
+        integral_rate = 0.;
+    }
+  }
+  i_error_ += integral_rate * dt.toSec() * p_error_;
 
   if (gains.antiwindup_ && gains.i_gain_ != 0) {
     // Prevent i_error_ from climbing higher than permitted by i_max_/i_min_
