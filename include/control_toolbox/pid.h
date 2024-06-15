@@ -34,14 +34,15 @@
 #ifndef CONTROL_TOOLBOX__PID_H
 #define CONTROL_TOOLBOX__PID_H
 
+#include <control_msgs/PidState.h>
+#include <ros/ros.h>
 
 #include <string>
-#include <ros/ros.h>
-#include <control_msgs/PidState.h>
 
 // Dynamic reconfigure
-#include <dynamic_reconfigure/server.h>
 #include <control_toolbox/ParametersConfig.h>
+#include <dynamic_reconfigure/server.h>
+
 #include <boost/thread/mutex.hpp>
 
 // Realtime buffer
@@ -50,7 +51,8 @@
 
 class TiXmlElement;
 
-namespace control_toolbox {
+namespace control_toolbox
+{
 
 /***************************************************/
 /*! \class Pid
@@ -117,7 +119,6 @@ namespace control_toolbox {
 class Pid
 {
 public:
-
   /*!
    * \brief Store gains in a struct to allow easier realtime buffer usage
    */
@@ -125,31 +126,18 @@ public:
   {
     // Optional constructor for passing in values without antiwindup
     Gains(double p, double i, double d, double i_max, double i_min)
-      : p_gain_(p),
-        i_gain_(i),
-        d_gain_(d),
-        i_max_(i_max),
-        i_min_(i_min),
-        antiwindup_(false)
-    {}
+    : p_gain_(p), i_gain_(i), d_gain_(d), i_max_(i_max), i_min_(i_min), antiwindup_(false)
+    {
+    }
     // Optional constructor for passing in values
     Gains(double p, double i, double d, double i_max, double i_min, bool antiwindup)
-      : p_gain_(p),
-        i_gain_(i),
-        d_gain_(d),
-        i_max_(i_max),
-        i_min_(i_min),
-        antiwindup_(antiwindup)
-    {}
+    : p_gain_(p), i_gain_(i), d_gain_(d), i_max_(i_max), i_min_(i_min), antiwindup_(antiwindup)
+    {
+    }
     // Default constructor
-    Gains()
-      : p_gain_(0.0),
-        i_gain_(0.0),
-        d_gain_(0.0),
-        i_max_(0.0),
-        i_min_(0.0),
-        antiwindup_(false)
-    {}
+    Gains() : p_gain_(0.0), i_gain_(0.0), d_gain_(0.0), i_max_(0.0), i_min_(0.0), antiwindup_(false)
+    {
+    }
     double p_gain_;   /**< Proportional gain. */
     double i_gain_;   /**< Integral gain. */
     double d_gain_;   /**< Derivative gain. */
@@ -169,13 +157,15 @@ public:
    * \param i_max The max integral windup.
    * \param i_min The min integral windup.
    */
-  Pid(double p = 0.0, double i = 0.0, double d = 0.0, double i_max = 0.0, double i_min = -0.0, bool antiwindup = false);
+  Pid(
+    double p = 0.0, double i = 0.0, double d = 0.0, double i_max = 0.0, double i_min = -0.0,
+    bool antiwindup = false);
 
   /**
    * \brief Copy constructor required for preventing mutexes from being copied
    * \param source - Pid to copy
    */
-  Pid(const Pid &source);
+  Pid(const Pid & source);
 
   /*!
    * \brief Destructor of Pid class.
@@ -204,8 +194,11 @@ public:
    * \param i_max The max integral windup.
    * \param i_min The min integral windup.
    */
-  void initPid(double p, double i, double d, double i_max, double i_min, const ros::NodeHandle& /*node*/);
-  void initPid(double p, double i, double d, double i_max, double i_min, bool antiwindup, const ros::NodeHandle& /*node*/);
+  void initPid(
+    double p, double i, double d, double i_max, double i_min, const ros::NodeHandle & /*node*/);
+  void initPid(
+    double p, double i, double d, double i_max, double i_min, bool antiwindup,
+    const ros::NodeHandle & /*node*/);
 
   /*!
    * \brief Initialize PID with the parameters in a namespace
@@ -214,7 +207,7 @@ public:
    * \param prefix The namespace prefix.
    * \param quiet If true, no error messages will be emitted on failure.
    */
-  bool initParam(const std::string& prefix, const bool quiet=false);
+  bool initParam(const std::string & prefix, const bool quiet = false);
 
   /*!
    * \brief Initialize PID with the parameters in a NodeHandle namespace
@@ -223,7 +216,7 @@ public:
    * \param n The NodeHandle which should be used to query parameters.
    * \param quiet If true, no error messages will be emitted on failure.
    */
-  bool init(const ros::NodeHandle &n, const bool quiet=false);
+  bool init(const ros::NodeHandle & n, const bool quiet = false);
 
   /*!
    * \brief Initialize PID with the parameters in an XML element
@@ -231,13 +224,13 @@ public:
    *
    * \param config the XML element
    */
-  bool initXml(TiXmlElement *config);
+  bool initXml(TiXmlElement * config);
 
   /**
    * @brief Start the dynamic reconfigure node and load the default values
    * @param node - a node handle where dynamic reconfigure services will be published
    */
-  void initDynamicReconfig(ros::NodeHandle &node);
+  void initDynamicReconfig(ros::NodeHandle & node);
 
   /*!
    * \brief Reset the state of this PID controller
@@ -257,8 +250,9 @@ public:
    * \param i_max The max integral windup.
    * \param i_min The min integral windup.
    */
-  void getGains(double &p, double &i, double &d, double &i_max, double &i_min);
-  void getGains(double &p, double &i, double &d, double &i_max, double &i_min, bool &antiwindup);
+  void getGains(double & p, double & i, double & d, double & i_max, double & i_min);
+  void getGains(
+    double & p, double & i, double & d, double & i_max, double & i_min, bool & antiwindup);
 
   /*!
    * \brief Get PID gains for the controller.
@@ -280,7 +274,7 @@ public:
    * \brief Set PID gains for the controller.
    * \param gains A struct of the PID gain values
    */
-  void setGains(const Gains &gains);
+  void setGains(const Gains & gains);
 
   /**
    * @brief Set Dynamic Reconfigure's gains to Pid's values
@@ -292,7 +286,7 @@ public:
   /**
    * \brief Update the PID parameters from dynamics reconfigure
    */
-  void dynamicReconfigCallback(control_toolbox::ParametersConfig &config, uint32_t /*level*/);
+  void dynamicReconfigCallback(control_toolbox::ParametersConfig & config, uint32_t /*level*/);
 
   /*!
    * \brief Set the PID error and compute the PID command with nonuniform time
@@ -365,8 +359,7 @@ public:
    * \param ie  The integral error.
    * \param de  The derivative error.
    */
-  void getCurrentPIDErrors(double *pe, double *ie, double *de);
-
+  void getCurrentPIDErrors(double * pe, double * ie, double * de);
 
   /*!
    * \brief Print to console the current parameters
@@ -377,10 +370,9 @@ public:
    * @brief Custom assignment operator
    *        Does not initialize dynamic reconfigure for PID gains
    */
-  Pid &operator =(const Pid& source)
+  Pid & operator=(const Pid & source)
   {
-    if (this == &source)
-      return *this;
+    if (this == &source) return *this;
 
     // Copy the realtime buffer to then new PID class
     gains_buffer_ = source.gains_buffer_;
@@ -392,7 +384,6 @@ public:
   }
 
 private:
-
   // Store the PID gains in a realtime buffer to allow dynamic reconfigure to update it without
   // blocking the realtime update loop
   realtime_tools::RealtimeBuffer<Gains> gains_buffer_;
@@ -401,11 +392,11 @@ private:
   bool publish_state_;
 
   bool valid_p_error_last_; /**< Is saved position state valid for derivative state calculation */
-  double p_error_last_; /**< _Save position state for derivative state calculation. */
-  double p_error_; /**< Position error. */
-  double i_error_; /**< Integral of position error. */
-  double d_error_; /**< Derivative of position error. */
-  double cmd_;     /**< Command to send. */
+  double p_error_last_;     /**< _Save position state for derivative state calculation. */
+  double p_error_;          /**< Position error. */
+  double i_error_;          /**< Integral of position error. */
+  double d_error_;          /**< Derivative of position error. */
+  double cmd_;              /**< Command to send. */
 
   // Dynamics reconfigure
   bool dynamic_reconfig_initialized_;
@@ -414,9 +405,8 @@ private:
   DynamicReconfigServer::CallbackType param_reconfig_callback_;
 
   boost::recursive_mutex param_reconfig_mutex_;
-
 };
 
-}
+}  // namespace control_toolbox
 
 #endif
